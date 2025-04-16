@@ -14,34 +14,39 @@ const TraineeRegister = () => {
     const [job_title, setJobTitle] = useState("");
     const [department, setDepartment] = useState("");
     const [linkedin_profile, setLinkedIn] = useState("");
+    const [resume, setResume] = useState(null);
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
         setErrorMessage("");
-    
+
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("username", username);
+        formData.append("email_address", email_address);
+        formData.append("phoneno", phoneno);
+        formData.append("password", password);
+        formData.append("home_address", home_address);
+        formData.append("job_title", job_title);
+        formData.append("department", department);
+        formData.append("linkedin_profile", linkedin_profile);
+        formData.append("resume", resume);
+
         try {
-            const token = localStorage.getItem("TlToken"); // Get token from storage
+            const token = localStorage.getItem("TlToken");
+
             const response = await axios.post(
                 "http://127.0.0.1:8000/empapi/register/",
-                {
-                    name,
-                    username,
-                    email_address,
-                    phoneno,
-                    password,
-                    home_address,
-                    job_title,
-                    department,
-                    linkedin_profile,
-                },
+                formData,
                 {
                     headers: {
-                        Authorization: `Token ${token}`, // Add authentication token
+                        Authorization: `Token ${token}`,
+                        "Content-Type": "multipart/form-data",
                     },
                 }
             );
-    
+
             if (response.status === 200) {
                 Swal.fire({
                     icon: "success",
@@ -55,123 +60,130 @@ const TraineeRegister = () => {
             }
         } catch (error) {
             console.error("Registration error:", error);
-            setErrorMessage(error?.response?.data?.detail || "Registration failed");
+            setErrorMessage(
+                error?.response?.data?.detail || "Registration failed"
+            );
         }
     };
 
     return (
-        <>
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="bg-white rounded-lg shadow-md border border-gray-300 p-6 w-96">
-                    <h2 className="text-2xl font-bold text-gray-900 text-center mb-4">
-                        Trainee Registration
-                    </h2>
-                    <form onSubmit={handleRegister} className="space-y-4">
-                        <div className="grid grid-cols-1 gap-4">
-                            <input
-                                type="text"
-                                name="name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                required
-                                placeholder="Enter the Name"
-                                className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            />
-                            <input
-                                type="text"
-                                name="username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                                placeholder="User Name"
-                                className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            />
-
-                            <input
-                                type="email"
-                                name="email_address"
-                                value={email_address}
-                                onChange={(e) =>
-                                    setEmailAddress(e.target.value)
-                                }
-                                required
-                                placeholder="Email"
-                                className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            />
-                            <input
-                                type="tel"
-                                name="phoneno"
-                                value={phoneno}
-                                onChange={(e) => setPhoneNo(e.target.value)}
-                                required
-                                placeholder="Phone Number"
-                                className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            />
-                            {/* {errorMessage && (
-              <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
-            )} */}
-
-                            <input
-                                type="password"
-                                name="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                placeholder="Password"
-                                className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            />
-                            <input
-                                type="text"
-                                name="deparment"
-                                value={department}
-                                onChange={(e) => setDepartment(e.target.value)}
-                                required
-                                placeholder="Department"
-                                className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            />
-                            <input
-                                type="text"
-                                name="job title"
-                                value={job_title}
-                                onChange={(e) => setJobTitle(e.target.value)}
-                                required
-                                placeholder="Position"
-                                className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            />
-                            <input
-                                type="text"
-                                name="home_address"
-                                value={home_address}
-                                onChange={(e) => setHomeAdress(e.target.value)}
-                                required
-                                placeholder="Home Address"
-                                className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            />
-                            <input
-                                type="text"
-                                name="linkedIn_profile"
-                                value={linkedin_profile}
-                                onChange={(e) => setLinkedIn(e.target.value)}
-                                required
-                                placeholder="LInkedin Profile"
-                                className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            />
-                        </div>
-                        {errorMessage && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errorMessage}
-                            </p>
-                        )}
-                        <button
-                            type="submit"
-                            className="w-full mt-4 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            Register Trainee
-                        </button>
-                    </form>
-                </div>
+        <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+            <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+                <h2 className="text-3xl font-semibold text-center text-indigo-700 mb-6">
+                    Register Trainee
+                </h2>
+                <form onSubmit={handleRegister} className="space-y-4">
+                    <div>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                            placeholder="Full Name"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                            placeholder="Username"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="email"
+                            value={email_address}
+                            onChange={(e) => setEmailAddress(e.target.value)}
+                            required
+                            placeholder="Email Address"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="tel"
+                            value={phoneno}
+                            onChange={(e) => setPhoneNo(e.target.value)}
+                            required
+                            placeholder="Phone Number"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            placeholder="Password"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="text"
+                            value={department}
+                            onChange={(e) => setDepartment(e.target.value)}
+                            required
+                            placeholder="Department"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="text"
+                            value={job_title}
+                            onChange={(e) => setJobTitle(e.target.value)}
+                            required
+                            placeholder="Job Title"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="text"
+                            value={home_address}
+                            onChange={(e) => setHomeAdress(e.target.value)}
+                            required
+                            placeholder="Home Address"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="text"
+                            value={linkedin_profile}
+                            onChange={(e) => setLinkedIn(e.target.value)}
+                            required
+                            placeholder="LinkedIn Profile"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="file"
+                            accept=".pdf,.doc,.docx"
+                            onChange={(e) => setResume(e.target.files[0])}
+                            required
+                            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border file:border-gray-300 file:rounded-lg file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                        />
+                    </div>
+                    {errorMessage && (
+                        <p className="text-red-500 text-sm">{errorMessage}</p>
+                    )}
+                    <button
+                        type="submit"
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition"
+                    >
+                        Register
+                    </button>
+                </form>
             </div>
-        </>
+        </div>
     );
 };
 
