@@ -32,7 +32,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
-  // hide last border
   "&:last-child td, &:last-child th": {
     border: 0,
   },
@@ -51,8 +50,8 @@ const style = {
 
 const ApprovalTableTrainee = ({ data, getTraineeList }) => {
   const [open, setOpen] = useState(false);
-  // const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
   const handleAccept = async (id) => {
     const token = localStorage.getItem("adminToken");
     const result = await approveTraineeAPI(id, token);
@@ -60,11 +59,12 @@ const ApprovalTableTrainee = ({ data, getTraineeList }) => {
       Swal.fire({
         icon: "success",
         title: "Approved",
-        text: "You have successfully approved the manager",
+        text: "You have successfully approved the trainee",
       });
       getTraineeList();
     }
   };
+
   return (
     <div>
       {data?.length === 0 ? (
@@ -77,34 +77,43 @@ const ApprovalTableTrainee = ({ data, getTraineeList }) => {
                 <StyledTableCell>Full Name</StyledTableCell>
                 <StyledTableCell align="right">Email address</StyledTableCell>
                 <StyledTableCell align="right">Phone Number</StyledTableCell>
-                <StyledTableCell align="right">Position</StyledTableCell>
-
+                <StyledTableCell align="right">Resume</StyledTableCell>
                 <StyledTableCell align="right">Action</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {data.map((row) => {
+                console.log("Resume URL for", row.name || row.firstname, ":", row.resume);
                 return (
                   <StyledTableRow key={row.id}>
                     <StyledTableCell component="th" scope="row">
                       <span className="capitalize">
                         {row.name
                           ? row.name
-                          : `${row.Firstname} ${row.lastname}`}
+                          : `${row.firstname || ""} ${row.lastname || ""}`}
                       </span>
                     </StyledTableCell>
                     <StyledTableCell align="right">
                       {row.email_address}
                     </StyledTableCell>
-
-                    <StyledTableCell align="right" className="h-full">
+                    <StyledTableCell align="right">
                       {row.phoneno}
                     </StyledTableCell>
                     <StyledTableCell align="right">
-                      {row.position}
+                      {row.resume ? (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          color="primary"
+                          onClick={() => window.open(`http://127.0.0.1:8000${row.resume}`, "_blank")}
+                        >
+                          View Resume
+                        </Button>
+                      ) : (
+                        "No resume"
+                      )}
                     </StyledTableCell>
-
-                    <StyledTableCell align="right" className="h-full">
+                    <StyledTableCell align="right">
                       <div className="flex gap-4 justify-end">
                         <Button
                           size="small"
@@ -123,6 +132,8 @@ const ApprovalTableTrainee = ({ data, getTraineeList }) => {
           </Table>
         </TableContainer>
       )}
+
+      {/* Optional Reject Modal */}
       <Modal
         open={open}
         onClose={handleClose}
@@ -131,7 +142,7 @@ const ApprovalTableTrainee = ({ data, getTraineeList }) => {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            <p className="text-center"> Are you sure you want to reject?</p>
+            <p className="text-center">Are you sure you want to reject?</p>
           </Typography>
           <div className="flex gap-4 justify-center mt-6">
             <Button size="small" variant="contained" color="success">
@@ -159,11 +170,8 @@ ApprovalTableTrainee.propTypes = {
       lastname: PropTypes.string,
       email_address: PropTypes.string,
       id: PropTypes.number,
-      in_team: PropTypes.bool,
-      is_adminapproved: PropTypes.bool,
       phoneno: PropTypes.number,
-      position: PropTypes.string,
-      user_type: PropTypes.string,
+      resume: PropTypes.string,
     })
   ),
   getTraineeList: PropTypes.func,
